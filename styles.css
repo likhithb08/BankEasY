@@ -1,0 +1,657 @@
+/* Gumroad-inspired CSS Design */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+    color: #1a1a1a;
+    line-height: 1.6;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+/* Common Button Styles */
+button {
+    background: #0015ff;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: none;
+}
+
+button:hover {
+    background: #0000cc;
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Header and Welcome Styles */
+h1, h2, h3 {
+    color: #1a1a1a;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+h1 {
+    font-size: 32px;
+    text-align: center;
+    margin: 40px 0;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+h3 {
+    font-size: 20px;
+    color: #666;
+}
+
+/* Welcome Message and Logout */
+#welcome-message {
+    text-align: center;
+    margin: 40px 0 20px 0;
+    padding: 20px;
+}
+
+#welcome-message h2 {
+    color: #1a1a1a;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+/* Logout Button */
+#logout {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    margin: 0;
+}
+
+#logout:hover::after {
+    transform: translateY(-1px);
+    content: "Logout";
+}
+
+/* Balance Card */
+#balance-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin: 20px auto;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    border: 1px solid #e5e5e5;
+}
+
+#balance-card h3 {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+#balance-card h3:last-child {
+    font-size: 32px;
+    color: #0015ff;
+    font-weight: 700;
+}
+
+/* Transactions Section */
+#transacs {
+    text-align: center;
+    margin: 60px 0 30px 0;
+    color: #1a1a1a;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.transactions {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+/* Transaction Cards */
+#deposit-amt, #withdraw-amt {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    min-height: 200px;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+/* Transaction Card Buttons */
+#deposit-amt button, #withdraw-amt button {
+    width: 200px;
+    text-align: center;
+    margin: 5px 0;
+}
+
+#deposit-amt:hover, #withdraw-amt:hover {
+    transform: translateY(-2px);
+}
+
+/* Modal Styles */
+.Modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 40px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    border: 1px solid #e5e5e5;
+}
+
+.modal-content h2 {
+    margin-bottom: 25px;
+    text-align: center;
+    color: #1a1a1a;
+}
+
+/* Modal Form Styles */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal-content input[type="number"],
+.modal-content input[type="text"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: #0015ff;
+}
+
+/* Modal Button Container */
+.modal-content .button-container {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.modal-content .button-container button {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* Close Button */
+#close-modal {
+    font-size: 24px;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    cursor: pointer;
+    color: #666;
+    font-weight: 300;
+}
+
+#close-modal:hover {
+    color: #1a1a1a;
+}
+
+/* Login and Register Pages */
+#login-section, #register-section {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    margin: 50px auto;
+    max-width: 400px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e5e5;
+    width: 100%;
+}
+
+#login-section h2, #register-section h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Form Labels and Layout */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Remove br tags spacing */
+br {
+    display: none;
+}
+
+/* Transaction Details */
+#showTransactionDetails {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin: 30px auto;
+    max-width: 800px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e5e5;
+}
+
+#showDeposits div {
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    background: #f8f9fa;
+}
+
+#showDeposits div:last-child {
+    border-bottom: none;
+}
+
+/* Index Page Styles */
+body:has(h1:only-child) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+body:has(h1:only-child) h1 {
+    font-size: 48px;
+    margin-bottom: 40px;
+    color: #0015ff;
+}
+
+/* Button Container for Index Page */
+.button-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.button-container button {
+    margin: 0;
+    padding: 15px 30px;
+    font-size: 16px;
+    min-width: 120px;
+}
+
+/* Secondary Button Styles */
+button[type="reset"] {
+    background: #666;
+}
+
+button[type="reset"]:hover {
+    background: #555;
+}
+
+/* Focus States */
+button:focus, input:focus {
+    outline: 2px solid #0015ff;
+    outline-offset: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .transactions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    #deposit-amt, #withdraw-amt {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    #deposit-amt button, #withdraw-amt button {
+        width: 180px;
+    }
+    
+    body {
+        padding: 15px;
+    }
+    
+    .modal-content {
+        padding: 30px 20px;
+    }
+    
+    .modal-content .button-container {
+        flex-direction: column;
+    }
+    
+    .modal-content .button-container button {
+        width: 100%;
+    }
+    
+    #login-section, #register-section {
+        padding: 30px 20px;
+        margin: 20px auto;
+    }
+    
+    #logout {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin: 10px auto;
+        display: block;
+    }
+    
+    body:has(h1:only-child) h1 {
+        font-size: 36px;
+    }
+    
+    .button-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .button-container button {
+        width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    #deposit-amt button, #withdraw-amt button {
+        width: 160px;
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .button-container button {
+        width: 180px;
+        padding: 12px 20px;
+    }
+}
+
+
+
+/*Dashboard ai Styles */
+/* AI Chat Button Styles */
+.ai-chat-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-chat-btn:hover {
+    background: rgba(212, 255, 0, 0.1);
+    border-color: rgba(212, 255, 0, 0.3);
+    transform: translateY(-1px);
+}
+
+.chat-icon {
+    font-size: 16px;
+}
+
+.chat-text {
+    font-weight: 500;
+}
+
+/* Chat Window Styles */
+.chat-window {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 380px;
+    height: 500px;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(212, 255, 0, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.chat-window.active {
+    display: flex;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(20, 20, 20, 0.9);
+}
+
+.chat-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.close-chat {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.close-chat:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 5px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(212, 255, 0, 0.2);
+    border-radius: 10px;
+}
+
+.message {
+    display: flex;
+    max-width: 85%;
+}
+
+.bot-message {
+    align-self: flex-start;
+}
+
+.user-message {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message-content {
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.bot-message .message-content {
+    background: rgba(212, 255, 0, 0.1);
+    border: 1px solid rgba(212, 255, 0, 0.2);
+    color: #d4ff00;
+}
+
+.user-message .message-content {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.chat-input {
+    display: flex;
+    padding: 20px;
+    gap: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(20, 20, 20, 0.9);
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 12px 16px;
+    background: rgba(40, 40, 40, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.chat-input input:focus {
+    outline: none;
+    border-color: rgba(212, 255, 0, 0.4);
+}
+
+.chat-input button {
+    padding: 12px 20px;
+    background: #d4ff00;
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chat-input button:hover {
+    background: #e5ff33;
+    transform: translateY(-1px);
+}
+
+/* Light Theme Support */
+body.light-theme .chat-window {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(212, 255, 0, 0.3);
+}
+
+body.light-theme .chat-header {
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .chat-input {
+    background: rgba(255, 255, 255, 0.9);
+    border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .chat-input input {
+    background: #f5f5f5;
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #1a1a1a;
+}
+
+body.light-theme .user-message .message-content {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #1a1a1a;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ai-chat-btn .chat-text {
+        display: none;
+    }
+    
+    .ai-chat-btn {
+        padding: 10px;
+    }
+    
+    .chat-window {
+        width: calc(100vw - 40px);
+        height: 70vh;
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+    }
+}
