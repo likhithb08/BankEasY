@@ -266,7 +266,7 @@
         
         <form>
             <div class="form-group">
-                <label for="loginUsername">Enter your Email</label>
+                <label for="loginUsername">Enter your Username</label>
                 <input type="text" id="loginUsername" placeholder="Enter your Email" required>
             </div>
 
@@ -288,35 +288,27 @@
         </div>
     </div>
 
-    <script>
-        //Javascript code to validate the user login credentials and provide access to the banking dashboard.
-
-        let user = JSON.parse(localStorage.getItem("user"))
-        console.log(user)
-        let username = document.getElementById("loginUsername")
-        let password = document.getElementById("loginPassword")
-
-        console.log(username.value)
-        console.log(password.value)
-
+<script>
+    function validateUser() {
+        let user = JSON.parse(localStorage.getItem("user"));
+        let username = document.getElementById("loginUsername").value;
+        let password = document.getElementById("loginPassword").value;
 
         if (!user) {
-            alert("no user exist!!")
+            alert("No user exists! Please register first.");
+            return;
         }
 
-        
-
-        function validateUser() {
-            if (username.value === user.username && password.value === user.password) {
-                alert("Loggin Successfull")
-                window.location.href = "Dashboard.html"
-            } else {
-                alert("Invalid credentials!!")
-            }
+        if (username === user.username && password === user.password) {
+            alert("Login Successful!");
+            localStorage.setItem("activeUser", user.username);
+            window.location.href = "Dashboard.html";
+        } else {
+            alert("Invalid credentials!");
         }
-        localStorage.setItem("activeUser", user.username);
+    }
+</script>
 
-    </script>
 </body>
 
 </html>
