@@ -1,7 +1,6 @@
 package com.example.BankEasyBackend.TransactionController;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.example.BankEasyBackend.Model.*;
+import com.example.BankEasyBackend.DTO.TransactionRequest;
 
 @RestController
 @RequestMapping("api/transactions")
@@ -26,19 +26,19 @@ public class TransactionController {
     }
 
     @PostMapping("/deposit")
-    public String deposit(@RequestBody Map<String, Object> body) {
+    public String deposit(@RequestBody TransactionRequest request) {
         return service.deposit(
-                (String) body.get("username"),
-                Double.parseDouble(body.get("amount").toString()),
-                (String) body.get("note"));
+                request.getUsername(),
+                request.getAmount(),
+                request.getNote());
     }
 
     @PostMapping("/withdraw")
-    public String withdraw(@RequestBody Map<String, Object> body) {
+    public String withdraw(@RequestBody TransactionRequest request) {
         return service.withdraw(
-                (String) body.get("username"),
-                Double.parseDouble(body.get("amount").toString()),
-                (String) body.get("note"));
+                request.getUsername(),
+                request.getAmount(),
+                request.getNote());
     }
 
     @GetMapping("/history/{username}")

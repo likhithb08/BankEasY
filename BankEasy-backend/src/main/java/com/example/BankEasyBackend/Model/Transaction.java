@@ -12,7 +12,7 @@ public class Transaction {
     private Long id;
 
     private String username;
-    private double amount;
+    private Double amount = 0.0;
     private String type;
     private String note;
 
