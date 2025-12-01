@@ -2,6 +2,7 @@ package com.example.BankEasyBackend.Model;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -17,7 +18,9 @@ public class User {
     private String password;
     private String accountType;
     private String phone;
-    private Double balance = 0.0;
+    @Column(nullable = false)
+    private Double balance;
+
     private LocalDate dateCreated;
 
     public User() {

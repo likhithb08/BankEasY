@@ -311,7 +311,8 @@
 
                 if (user && user.username) {
                     //saveing the session
-                    localStorage.setItem("storedUser", JSON.stringify(user))
+                    localStorage.setItem("activeUser", user.username)
+                    localStorage.setItem("user", JSON.stringify(user))
                     window.location.href = "Dashboard.html"
                 } else {
                     alert("Invalid credentials..!")

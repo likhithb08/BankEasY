@@ -1,8 +1,7 @@
 /// Dashboard Scripts
-
-let storedUser = localStorage.getItem("activeUser");
 let userData = JSON.parse(localStorage.getItem("user"));
-console.log(userData);
+let storedUser = userData.username;
+
 //Display personalization with username
 let name = document.getElementById("name");
 name.innerText = userData.name;
@@ -21,46 +20,96 @@ profileDate.innerHTML = new Date(userData.date).toLocaleDateString();
 profileName.innerHTML = userData.name;
 
 //Displaying Balance
-let balanceKey = "balance_" + storedUser;
-let balance = JSON.parse(localStorage.getItem(balanceKey)) || 0;
-let balanceAmount = document.getElementById("balance-amount");
-balanceAmount.innerHTML = "₹" + balance.toFixed(2);
+let balanceAmount = document.getElementById("balance-amount")
+async function getBalance() {
+  try {
+    let response = await fetch(
+      `http://localhost:8080/api/transactions/balance/${storedUser}`
+    );
+    let data = await response.json();
+    balanceAmount.innerHTML = "₹" + data.toFixed(2)
+    return data
+  } catch (e) {
+    alert(e);
+  }
+}
+getBalance()
 
 //transaction actions
 let transactions = document.getElementById("transactions");
+async function getTransactions(){
+  try{
+    let response = await fetch(`http://localhost:8080/api/transactions/history/${storedUser}`)
+    return await response.json()
+  }catch(e){
+    alert(e)
+  }
+}
+
+getTransactions()
+
+async function loadTransactions(){
+  let transactions = await getTransactions()
+  return transactions
+}
+loadTransactions()
+
+async function totalDeposits(){
+  let transactions =  await loadTransactions()
+  let deposits = transactions.filter((t) => t.type === "DEPOSIT")
+  let total = deposits.reduce((acc, dep) => acc + dep.amount, 0)
+  return total
+}
+
 
 let depositBtn = document.getElementById("deposit-btn");
-let depositKey = "deposits_" + storedUser;
-let deposits = JSON.parse(localStorage.getItem(depositKey)) || [];
-depositBtn.addEventListener("click", () => {
+
+depositBtn.addEventListener("click", async () => {
   let depositAmount = parseFloat(
     document.getElementById("deposit-amount").value
   );
   let depositMessage = document.getElementById("deposit-message").value;
   let accountNumber = parseInt(document.getElementById("account-number").value);
 
-  if (depositAmount > 0) {
-    balance += depositAmount;
-    localStorage.setItem(balanceKey, JSON.stringify(balance));
-    balanceAmount.innerHTML = "₹" + balance.toFixed(2);
-    alert("Deposit Successfull!..");
-    document.getElementById("deposit-amount").value = "";
-    document.getElementById("deposit-message").value = "";
-    deposits.push({
-      amount: depositAmount,
-      message: depositMessage,
-      date: new Date().toISOString(),
-    });
-    localStorage.setItem(depositKey, JSON.stringify(deposits));
-    window.location.reload();
-  } else {
-    alert("Enter valid amount to deposit..");
+  let body = {
+    username : storedUser,
+    amount : depositAmount,
+    note : depositMessage
   }
+try{
+  
+  let response  = await fetch("http://localhost:8080/api/transactions/deposit",{
+    method :'POST',
+    headers:{
+      "Content-Type" : "application/json"
+    },
+    body : JSON.stringify(body)
+
+  })
+
+  let data = await response.text();
+
+  if(data === "User Not Found"){
+    alert(data)
+    console.log(data)
+  }
+  alert("Deposit Successful!")
+  await getBalance()
+}catch(e){
+  alert(e)
+}
 });
+
 //View All Deposits Functionality
 let viewDepositBtn = document.getElementById("view-deposits");
-viewDepositBtn.addEventListener("click", () => {
-  transactions.innerHTML = deposits.map((dep) => {
+let viewAllDeposits = async () => {
+  console.log("view deposit clicked")
+
+  let transactionsList = await loadTransactions()
+
+  let deposit = transactionsList.filter((t) => t.type === "DEPOSIT")
+  let transactionsCont = document.getElementById("transactions");
+  transactionsCont.innerHTML = deposit.map((dep) => {
     // switch to deposits tab
     document
       .querySelectorAll(".filter-btn")
@@ -68,201 +117,129 @@ viewDepositBtn.addEventListener("click", () => {
     document
       .querySelector('.filter-btn[data-filter="deposit"]')
       .classList.add("active");
-    return `
-                    <div id="showDepositDiv">
-                        <div class="history-item">
-                            <div class="history-left">
-                                <div class="history-icon deposit">💰</div>
-                                <div class="history-details">
-                                    <h4>Deposit</h4>
-                                    <p>${dep.message || "No note added"}</p>
-                                    <p class="history-date">${new Date(
-                                      dep.date
-                                    ).toLocaleDateString()}</p> 
-                                </div>
-                            </div>
-                            <div class="history-right">
-                                <div class="history-amount positive">+ ₹${dep.amount.toFixed(
-                                  2
-                                )}</div>  
-                            </div>
-                        </div>
-                    </div>
-                    </div>`;
-  });
-});
 
-// total deposits display
-let totalDepositsAmount =
-  "₹ " + deposits.reduce((acc, curr) => acc + curr.amount, 0).toFixed(2);
-let totalDeposits = deposits.length;
-console.log(totalDeposits);
-let totalDepositsDisplay = document.getElementById("total-deposits");
-totalDepositsDisplay.innerHTML = `${totalDepositsAmount}`;
-
-//withDraw Functionality
-let withdrawBtn = document.getElementById("withdraw-btn");
-let withdrawkey = "withdrawals_" + storedUser;
-let withdrawals = JSON.parse(localStorage.getItem(withdrawkey)) || [];
-withdrawBtn.addEventListener("click", () => {
-  let withdrawAmount = parseFloat(
-    document.getElementById("withdraw-amount").value
-  );
-  if (!withdrawAmount || withdrawAmount <= 0) {
-    alert("Insufficient Balance To withdraw..");
-  }
-  if (withdrawAmount > balance) {
-    alert("Insufficient balance to withdraw..");
-  }
-  if (withdrawAmount > 0 && withdrawAmount <= balance) {
-    balance -= withdrawAmount;
-    localStorage.setItem(balanceKey, JSON.stringify(balance));
-    balanceAmount.innerHTML = "₹" + balance.toFixed(2);
-    alert("WithDrawal Successful!..");
-    document.getElementById("withdraw-amount").value = "";
-    withdrawals.push({
-      amount: withdrawAmount,
-      date: new Date().toISOString(),
-    });
-    localStorage.setItem(withdrawkey, JSON.stringify(withdrawals));
-    window.location.reload();
-  }
-});
-
-//View All Withdrawals Functionality
-let viewWithdrawalBtn = document.getElementById("view-withdrawals");
-viewWithdrawalBtn.addEventListener("click", () => {
-  document
-    .querySelectorAll(".filter-btn")
-    .forEach((btn) => btn.classList.remove("active"));
-  document
-    .querySelector('.filter-btn[data-filter="withdraw"]')
-    .classList.add("active");
-
-  transactions.innerHTML = withdrawals
-    .map((w) => {
       return `
-            <div class="history-item">
-                <div class="history-left">
-                    <div class="history-icon withdraw">💸</div>
-                    <div class="history-details">
-                        <h4>Withdrawal</h4>
-                        <p>${w.message || "No note added"}</p>
-                        <p class="history-date">${new Date(
-                          w.date
-                        ).toLocaleDateString()}</p>
-                    </div>
-                </div>
-                <div class="history-right">
-                    <div class="history-amount negative">- ₹${w.amount.toFixed(
-                      2
-                    )}</div>
-                </div>
-            </div>
-        `;
-    })
-    .join("");
-});
+      <div id="showDepositDiv">
+      <div class="history-item">
+      <div class="history-left">
+        <div class="history-icon deposit">💰</div>
+        <div class="history-details">
+          <h4>Deposit</h4>
+          <p>${dep.note || "No note added"}</p>
+          <p class="history-date">${new Date(
+            dep.date
+          ).toLocaleDateString()}</p> 
+        </div>
+      </div>
+      <div class="history-right">
+        <div class="history-amount positive">+ ₹${dep.amount.toFixed(
+          2
+        )}</div>  
+      </div>
+    </div>
+    </div>`
 
-//total withdrawals display
-let totalWithdrawals =
-  "₹ " + withdrawals.reduce((acc, curr) => acc + curr.amount, 0).toFixed(2);
-let totalWithdrawalsDislplay = document.getElementById("total-withdrawals");
-totalWithdrawalsDislplay.innerHTML = `${totalWithdrawals}`;
-
-//total transactions display
-let totalTransactions = deposits.length + withdrawals.length;
-let totalTransactionsDisplay = document.getElementById("total-transactions");
-totalTransactionsDisplay.innerHTML = `${totalTransactions}`;
-
-//all transactions display
-transactions.innerHTML = [
-  ...deposits.map((deposit) => ({ ...deposit, type: "deposit" })),
-  ...withdrawals.map((withdrawal) => ({ ...withdrawal, type: "withdraw" })),
-]
-  .sort((a, b) => new Date(b.date) - new Date(a.date))
-  .map((tran) => {
-    if (tran.type === "deposit") {
-      return `
-                    <div id="showDepositDiv">
-                        <div class="history-item">
-                            <div class="history-left">
-                                <div class="history-icon deposit">💰</div>
-                                <div class="history-details">
-                                    <h4>Deposit</h4>
-                                    <p class="history-date">${new Date(
-                                      tran.date
-                                    ).toLocaleDateString()}</p> 
-                                </div>
-                            </div>
-                            <div class="history-right">
-                                <div class="history-amount positive">+ ₹${
-                                  tran.amount ? tran.amount.toFixed(2) : "0.00"
-                                }</div>  
-                            </div>
-                        </div>
-                    </div>
-                    </div>`;
-    } else {
-      return `
-                    <div id="showDepositDiv">
-                        <div class="history-item">
-                            <div class="history-left">
-                                <div class="history-icon withdraw">💸</div>
-                                <div class="history-details">
-                                    <h4>Withdrawal</h4>
-                                    <p class="history-date">${new Date(
-                                      tran.date
-                                    ).toLocaleDateString()}</p> 
-                                </div>
-                            </div>
-                            <div class="history-right">
-                                <div class="history-amount negative">- ₹${tran.amount.toFixed(
-                                  2
-                                )}</div>  
-                            </div>
-                        </div>
-                    </div>
-                    </div>`;
-    }
-  })
-  .join("");
-
-//Hamburger menu functionality
-let hanmburgerBtn = document.getElementById("hamburger-btn");
-let dropdownMenu = document.getElementById("dropdown-menu");
-hanmburgerBtn.addEventListener("click", () => {
-  dropdownMenu.classList.toggle("active");
-  // hanmburgerBtn.classList.toggle("active")
-  document.body.classList.toggle("overflow-hidden");
-});
-
-//Theme toggle functionality
-let toggleBtn = document.getElementById("theme-toggle");
-toggleBtn.onclick = () => {
-  document.body.classList.toggle("light-theme");
+  }).join("")
 };
-//Logout Functionality
-let logoutBtn = document.getElementById("logout");
-logoutBtn.addEventListener("click", () => {
-  localStorage.removeItem("activeUser");
-  window.location.href = "login.html";
-});
+viewDepositBtn.addEventListener("click",viewAllDeposits)
 
-//Delete account funcionality
-let deleteAccount = document.getElementById("delete-account");
-deleteAccount.addEventListener("click", () => {
-  let comfirmDelete = confirm(
-    "Are you sure you want to delete your account? Thsi actioon can not be undone!.."
-  );
-  if (!comfirmDelete) {
-    return;
+let seeAllDeposits = document.getElementById("view-all-deposits");
+// seeAllDeposits.addEventListener("click",viewAllDeposits)
+
+
+let viewTotalDeposits = document.getElementById("total-deposits") 
+async function viewTotalDeposit(){
+  let totalDep = await totalDeposits()
+  viewTotalDeposits.innerHTML = "₹" + totalDep.toFixed(2)
+}
+viewTotalDeposit()
+
+// withdrawal functionality
+
+let withdrawBtn = document.getElementById("withdraw-btn")
+withdrawBtn.addEventListener("click", async ()=>{
+  let withdrawAmount = parseFloat(document.getElementById("withdraw-amount").value)
+  let withdrawMsg = document.getElementById("withdraw-message").value
+
+  let body = {
+    username  : storedUser,
+    amount : withdrawAmount,
+    note : withdrawMsg
   }
-  localStorage.removeItem(depositKey);
-  localStorage.removeItem(withdrawkey);
-  localStorage.removeItem(balanceKey);
-  localStorage.removeItem("activeUser");
-  localStorage.removeItem("user");
-  alert("Your account has been deleted successfully..");
-  window.location.href = "login.html";
-});
+
+  let response = await fetch("http://localhost:8080/api/transactions/withdraw",{
+    method : "POST",
+    headers : {
+      "Content-Type" : "application/json"
+    },
+    body : JSON.stringify(body)
+  })
+  let data = response.text();
+  if(data === "User Not Found"){
+    alert(data)
+    console.log(data)
+  }
+  alert("Withdrawal Successful!")
+  await getBalance()
+
+})
+
+let totalWithdrawals = document.getElementById("total-withdrawals")
+async function viewTotalWithdrawal(){
+  let transactions = await loadTransactions()
+  let withdrawls = transactions.filter((t)=> t.type === "WITHDRAW")
+  let total = withdrawls.reduce((acc,w)=>acc + w.amount , 0)
+
+  // return total
+
+  totalWithdrawals.innerHTML = "₹" + total.toFixed(2)
+}
+viewTotalWithdrawal()
+
+
+let viewWithdrawls = document.getElementById("view-withdrawals")
+let viewAllWithdrawls = async ()=>{
+  let transactionsList = await loadTransactions()
+  let withdrawals = transactionsList.filter((t)=> t.type === "WITHDRAW")
+  let transactionsCont = document.getElementById("transactions")
+  transactionsCont.innerHTML = withdrawals.map((w)=>{
+    // switch to withdrawls tab
+    document
+      .querySelectorAll(".filter-btn")
+      .forEach((btn) => btn.classList.remove("active"));
+    document
+      .querySelector('.filter-btn[data-filter="withdraw"]')
+      .classList.add("active");
+    return `
+    <div id="showWithdrawDiv">
+    <div class="history-item">
+    <div class="history-left">
+      <div class="history-icon withdraw">💰</div>
+      <div class="history-details">
+        <h4>Withdrawal</h4>
+        <p>${w.note || "No note added"}</p>
+        <p class="history-date">${new Date(
+          w.date
+        ).toLocaleDateString()}</p> 
+      </div>
+    </div>
+    <div class="history-right">
+      <div class="history-amount negative">- ₹${w.amount.toFixed(
+        2
+      )}</div>  
+    </div>
+  </div>
+  </div>`
+  }).join("")
+}
+viewWithdrawls.addEventListener("click",viewAllWithdrawls)
+
+let seeAllWithdrawals = document.getElementById("view-all-withdrawals");
+// seeAllWithdrawals.addEventListener("click",viewAllWithdrawls)
+ 
+
+
+
+
+
+
