@@ -36,7 +36,7 @@ public class User {
         this.accountType = accountType;
         this.phone = phone;
         this.dateCreated = dateCreated;
-        this.balance = balance;
+        this.balance = (balance != null) ? balance : 0.0;
     }
 
     // Getters and Setters
