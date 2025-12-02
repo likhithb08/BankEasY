@@ -16,7 +16,7 @@ let profileName = document.getElementById("profile-name");
 profileUsername.innerHTML = userData.username;
 profileEmail.innerHTML = userData.email;
 profilePhone.innerHTML = userData.phone;
-profileDate.innerHTML = new Date(userData.date).toLocaleDateString();
+profileDate.innerHTML = new Date(userData.dateCreated).toLocaleDateString();
 profileName.innerHTML = userData.name;
 
 //Displaying Balance
