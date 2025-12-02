@@ -1,23 +1,58 @@
 /// Dashboard Scripts
-let userData = JSON.parse(localStorage.getItem("user"));
-let storedUser = userData.username;
+async function loadUser (){
+  let response = await fetch("http://localhost:8080/api/auth/me", {
+    credentials : "include"
+  })
+  if(!response.ok){
+    window.location.href = "login.html"
+    return
+  }
 
-//Display personalization with username
-let name = document.getElementById("name");
-name.innerText = userData.name;
+  let user = await response.json();
+  return user
+}
+let storedUser = null;
+// //Display personalization with username
+// let name = document.getElementById("name");
+// name.innerText = userData.name;
 
-let profileUsername = document.getElementById("profile-username");
-let profileEmail = document.getElementById("profile-email");
-let profilePhone = document.getElementById("profile-phone");
-let profileDate = document.getElementById("profile-date");
-let profileName = document.getElementById("profile-name");
+// let profileUsername = document.getElementById("profile-username");
+// let profileEmail = document.getElementById("profile-email");
+// let profilePhone = document.getElementById("profile-phone");
+// let profileDate = document.getElementById("profile-date");
+// let profileName = document.getElementById("profile-name");
 
-//Display user Profile Details
-profileUsername.innerHTML = userData.username;
-profileEmail.innerHTML = userData.email;
-profilePhone.innerHTML = userData.phone;
-profileDate.innerHTML = new Date(userData.dateCreated).toLocaleDateString();
-profileName.innerHTML = userData.name;
+// //Display user Profile Details
+// profileUsername.innerHTML = userData.username;
+// profileEmail.innerHTML = userData.email;
+// profilePhone.innerHTML = userData.phone;
+// profileDate.innerHTML = new Date(userData.dateCreated).toLocaleDateString();
+// profileName.innerHTML = userData.name;
+
+async function initDashboard() {
+    let userData = await loadUser();   // WAIT for user
+    storedUser = userData.username;
+
+    console.log(storedUser)
+
+    // Fill UI
+    document.getElementById("name").innerText = userData.name;
+    document.getElementById("profile-username").innerText = userData.username;
+    document.getElementById("profile-name").innerText = userData.name;
+    document.getElementById("profile-email").innerText = userData.email;
+    document.getElementById("profile-phone").innerText = userData.phone;
+    document.getElementById("profile-date").innerText =
+        new Date(userData.dateCreated).toLocaleDateString();
+
+    // Load balance & stats
+    await getBalance(storedUser);
+    await viewTotalDeposit();
+    await viewTotalWithdrawal();
+    await viewTotalTransactions();
+}
+
+// 4. Call initializer
+initDashboard();
 
 //Displaying Balance
 let balanceAmount = document.getElementById("balance-amount")
@@ -248,6 +283,57 @@ viewTotalTransactions()
 
 
 
+// Toggle Button
+let toggleBtn = document.getElementById("theme-toggle")
+let theme = localStorage.getItem("theme")
+if(theme === 'light'){
+  document.body.classList.add("light-theme")
+}else{
+  document.body.classList.add("dark-theme")
+}
+async function toggleTheme(){
+  document.body.classList.toggle("light-theme")
+  document.body.classList.toggle("dark-theme")
+
+  const currentTheme = document.body.classList.contains("light-theme") ? "light" : "dark"
+
+  localStorage.setItem("theme", currentTheme)
+}
+toggleBtn.addEventListener("click", toggleTheme)
+
+//Hamburger
+let hamburgerBtn = document.getElementById("hamburger-btn")
+hamburgerBtn.addEventListener("click",async ()=>{
+  let dropdownMenu = document.getElementById("dropdown-menu")
+  dropdownMenu.classList.toggle("active")
+})
+
+
+//Logout 
+
+let logoutBtn = document.getElementById("logout")
+
+logoutBtn.addEventListener("click", async ()=>{
+  let response = await fetch("http://localhost:8080/api/auth/logout",{
+    method : "POST",
+    credentials : "include"
+  })
+  window.location.href = "login.html"
+})
+
+//Delete Account
+
+let deleteBtn = document.getElementById("delete-account")
+deleteBtn.addEventListener("click", async ()=>{
+  if(!confirm("Are you sure you want to delete the account?? think once again!")) return 
+
+  await fetch("http://localhost:8080/api/auth/delete", {
+    method : "DELETE",
+    credentials : "include"
+  })
+
+  window.location.href = "home.html"
+})
 
 
 
