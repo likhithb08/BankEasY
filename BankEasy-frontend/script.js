@@ -238,6 +238,14 @@ let seeAllWithdrawals = document.getElementById("view-all-withdrawals");
 // seeAllWithdrawals.addEventListener("click",viewAllWithdrawls)
  
 
+let totalTransactions = document.getElementById("total-transactions")
+async function viewTotalTransactions(){
+  let transactions = await loadTransactions()
+  let total = transactions.length
+  totalTransactions.innerHTML = total
+}
+viewTotalTransactions()
+
 
 
 
