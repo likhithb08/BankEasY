@@ -313,6 +313,7 @@
                     //saveing the session
                     localStorage.setItem("activeUser", user.username)
                     localStorage.setItem("user", JSON.stringify(user))
+                    console.log(user)
                     window.location.href = "Dashboard.html"
                 } else {
                     alert("Invalid credentials..!")
