@@ -302,8 +302,6 @@
                     credentials: "include",
                     body: JSON.stringify(loginReq)
                 });
-                let data = await response.json();
-                console.log(data)
 
                 if (!response.ok) {
                     alert("Invalid credentials!");
@@ -311,6 +309,7 @@
                 }
 
                 let user = await response.json();
+                console.log(user);
 
                 localStorage.setItem("user", JSON.stringify(user));
 

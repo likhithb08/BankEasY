@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
-    private final String secretKey = "a2VrbGFLcmFfcG93ZXJfMzJieXRlc19rZXkzMg==@Ycjc2pyuc9";
+    private final String secretKey = "c2VjcmV0LWtleS1mb3ItYmFuay1lYXN5LWJhY2tlbmQtYXBwbGljYXRpb24=";
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(java.util.Base64.getDecoder().decode(secretKey));
