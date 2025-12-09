@@ -16,7 +16,7 @@ import com.example.BankEasyBackend.DTO.TransactionRequest;
 
 @RestController
 @RequestMapping("api/transactions")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = { "http://127.0.0.1:5500", "http://localhost:5500" }, allowCredentials = "true")
 public class TransactionController {
 
     private final TransactionService service;
