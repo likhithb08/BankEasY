@@ -28,44 +28,49 @@ document.addEventListener("DOMContentLoaded", function () {
       addMessage(message, "user");
       chatInput.value = "";
 
-      const storedUser = localStorage.getItem("activeUser");
       const userData = JSON.parse(localStorage.getItem("user"));
-      const deposits =
-        JSON.parse(localStorage.getItem("deposits_" + storedUser)) || [];
-      const widthdraws =
-        JSON.parse(localStorage.getItem("withdrawals_" + storedUser)) || [];
-      const balance =
-        JSON.parse(localStorage.getItem("balance_" + storedUser)) || 0;
+      const storedUser = userData ? userData.username : null;
+      
+      let balance = 0;
+      let deposits = [];
+      let withdrawals = [];
+
+      if (storedUser) {
+          try {
+              // Fetch Balance
+              const balanceRes = await fetch(`http://127.0.0.1:8080/api/transactions/balance/${storedUser}`);
+              if (balanceRes.ok) {
+                  balance = await balanceRes.json();
+              }
+
+              // Fetch History
+              const historyRes = await fetch(`http://127.0.0.1:8080/api/transactions/history/${storedUser}`);
+              if (historyRes.ok) {
+                  const history = await historyRes.json();
+                  deposits = history.filter(t => t.type === 'DEPOSIT');
+                  withdrawals = history.filter(t => t.type === 'WITHDRAW');
+              }
+          } catch (err) {
+              console.error("Error fetching user financial data:", err);
+          }
+      }
 
       function normalizeDeposits(deposits) {
         return deposits.map((d) => {
-          if (typeof d === "object") {
             return {
               amount: d.amount,
-              message: d.message || "",
+              message: d.note || "",
               date: d.date || new Date().toISOString(),
             };
-          }
-          return {
-            amount: d,
-            message: "",
-            date: new Date().toISOString(),
-          };
         });
       }
 
       function normalizeWithdraws(withdraws) {
         return withdraws.map((w) => {
-          if (typeof w === "object") {
             return {
               amount: w.amount,
               date: w.date || new Date().toISOString(),
             };
-          }
-          return {
-            amount: w,
-            date: new Date().toISOString(),
-          };
         });
       }
 
@@ -74,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
         user: storedUser,
         question: message,
         deposits: normalizeDeposits(deposits),
-        withdraws: normalizeWithdraws(widthdraws),
+        withdraws: normalizeWithdraws(withdrawals),
         balance: balance,
       };
 
