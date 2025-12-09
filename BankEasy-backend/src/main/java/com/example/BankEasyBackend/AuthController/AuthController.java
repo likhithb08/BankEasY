@@ -75,8 +75,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse res) {
-        Cookie cookie = new Cookie("auth_token", null);
+    public ResponseEntity<?> logout(HttpServletResponse res, String token) {
+        Cookie cookie = new Cookie("auth_token", token);
         cookie.setHttpOnly(true);
         cookie.setSecure(false);
         cookie.setPath("/");
