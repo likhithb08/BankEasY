@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 @CrossOrigin(origins = { "http://127.0.0.1:5500", "http://localhost:5500" }, allowCredentials = "true")
 public class AuthController {
 
@@ -38,6 +38,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User req, HttpServletResponse response) {
         User user = authServices.login(req.getUsername(), req.getPassword());
+        System.out.println(user);
 
         if (user == null) {
             return ResponseEntity.status(401).body("Invalid Credentials");
@@ -51,17 +52,25 @@ public class AuthController {
         cookie.setSecure(false);
         cookie.setMaxAge(24 * 60 * 60);
 
-        response.addCookie(cookie);
+        String cookieHeader = String.format("auth_token=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Lax", token,
+                24 * 60 * 60);
+        response.addHeader("Set-Cookie", cookieHeader);
+
+        // response.addCookie(cookie);
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/me")
     public ResponseEntity<?> getLoggedUser(@CookieValue(value = "auth_token", required = false) String token) {
+
+        System.out.println("TOKEN FROM COOKIE = " + token);
+
         if (token == null || token.isEmpty()) {
-            return ResponseEntity.status(401).body("Unauthorized");
+            return ResponseEntity.status(401).body(java.util.Map.of("error", "Unauthorized"));
         }
 
         User user = authServices.validateTokenAndGetUser(token);
+        System.out.println("USER FROM TOKEN = " + (user != null ? user.getUsername() : "NULL"));
         return ResponseEntity.ok(user);
     }
 

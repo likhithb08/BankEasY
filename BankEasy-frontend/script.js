@@ -1,36 +1,35 @@
 /// Dashboard Scripts
 async function loadUser (){
-  let response = await fetch("http://localhost:8080/api/auth/me", {
-    credentials : "include"
-  })
-  if(!response.ok){
-    window.location.href = "login.html"
-    return
-  }
+    try {
+        const res = await fetch("http://127.0.0.1:8080/api/auth/me", {
+          method : "GET",
+            credentials: "include"
+        });
 
-  let user = await response.json();
-  return user
+        if (!res.ok) {
+            throw new Error("Unauthorized");
+        }
+
+        const data = await res.json();
+        console.log("User:", data);
+        return data
+    } catch (err) {
+        console.log("User not logged in:", err.message);
+        // CRITICAL FIX: You must redirect the user if they aren't logged in
+        // window.location.href = "login.html"; 
+        return null;
+    }
 }
 let storedUser = null;
-// //Display personalization with username
-// let name = document.getElementById("name");
-// name.innerText = userData.name;
-
-// let profileUsername = document.getElementById("profile-username");
-// let profileEmail = document.getElementById("profile-email");
-// let profilePhone = document.getElementById("profile-phone");
-// let profileDate = document.getElementById("profile-date");
-// let profileName = document.getElementById("profile-name");
-
-// //Display user Profile Details
-// profileUsername.innerHTML = userData.username;
-// profileEmail.innerHTML = userData.email;
-// profilePhone.innerHTML = userData.phone;
-// profileDate.innerHTML = new Date(userData.dateCreated).toLocaleDateString();
-// profileName.innerHTML = userData.name;
 
 async function initDashboard() {
     let userData = await loadUser();   // WAIT for user
+    
+    if (!userData) {
+        window.location.href = "login.html";
+        return;
+    }
+
     storedUser = userData.username;
 
     console.log(storedUser)
@@ -59,7 +58,7 @@ let balanceAmount = document.getElementById("balance-amount")
 async function getBalance() {
   try {
     let response = await fetch(
-      `http://localhost:8080/api/transactions/balance/${storedUser}`
+      `http://127.0.0.1:8080/api/transactions/balance/${storedUser}`
     );
     let data = await response.json();
     balanceAmount.innerHTML = "₹" + data.toFixed(2)
@@ -68,26 +67,26 @@ async function getBalance() {
     alert(e);
   }
 }
-getBalance()
+
 
 //transaction actions
 let transactions = document.getElementById("transactions");
 async function getTransactions(){
   try{
-    let response = await fetch(`http://localhost:8080/api/transactions/history/${storedUser}`)
+    let response = await fetch(`http://127.0.0.1:8080/api/transactions/history/${storedUser}`)
     return await response.json()
   }catch(e){
     alert(e)
   }
 }
 
-getTransactions()
+
 
 async function loadTransactions(){
   let transactions = await getTransactions()
   return transactions
 }
-loadTransactions()
+
 
 async function totalDeposits(){
   let transactions =  await loadTransactions()
@@ -113,7 +112,7 @@ depositBtn.addEventListener("click", async () => {
   }
 try{
   
-  let response  = await fetch("http://localhost:8080/api/transactions/deposit",{
+  let response  = await fetch("http://127.0.0.1:8080/api/transactions/deposit",{
     method :'POST',
     headers:{
       "Content-Type" : "application/json"
@@ -187,7 +186,7 @@ async function viewTotalDeposit(){
   let totalDep = await totalDeposits()
   viewTotalDeposits.innerHTML = "₹" + totalDep.toFixed(2)
 }
-viewTotalDeposit()
+
 
 // withdrawal functionality
 
@@ -202,7 +201,7 @@ withdrawBtn.addEventListener("click", async ()=>{
     note : withdrawMsg
   }
 
-  let response = await fetch("http://localhost:8080/api/transactions/withdraw",{
+  let response = await fetch("http://127.0.0.1:8080/api/transactions/withdraw",{
     method : "POST",
     headers : {
       "Content-Type" : "application/json"
@@ -229,7 +228,7 @@ async function viewTotalWithdrawal(){
 
   totalWithdrawals.innerHTML = "₹" + total.toFixed(2)
 }
-viewTotalWithdrawal()
+
 
 
 let viewWithdrawls = document.getElementById("view-withdrawals")
@@ -279,7 +278,7 @@ async function viewTotalTransactions(){
   let total = transactions.length
   totalTransactions.innerHTML = total
 }
-viewTotalTransactions()
+
 
 
 
@@ -314,7 +313,7 @@ hamburgerBtn.addEventListener("click",async ()=>{
 let logoutBtn = document.getElementById("logout")
 
 logoutBtn.addEventListener("click", async ()=>{
-  let response = await fetch("http://localhost:8080/api/auth/logout",{
+  let response = await fetch("http://127.0.0.1:8080/api/auth/logout",{
     method : "POST",
     credentials : "include"
   })
@@ -327,7 +326,7 @@ let deleteBtn = document.getElementById("delete-account")
 deleteBtn.addEventListener("click", async ()=>{
   if(!confirm("Are you sure you want to delete the account?? think once again!")) return 
 
-  await fetch("http://localhost:8080/api/auth/delete", {
+  await fetch("http://127.0.0.1:8080/api/auth/delete", {
     method : "DELETE",
     credentials : "include"
   })

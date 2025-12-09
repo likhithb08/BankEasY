@@ -3,32 +3,46 @@ package com.example.BankEasyBackend.Utils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
+import java.security.Key;
 import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
-    private final String secretKey = "abcde5%ghijk10!)lmnop15!%qrstu20@)vwxyz25@%";
 
-    private final Long EXPIRATION_TIME = 864000000L;
+    private final String secretKey = "a2VrbGFLcmFfcG93ZXJfMzJieXRlc19rZXkzMg==@Ycjc2pyuc9";
 
-    public String generateToken(String uername) {
-        return Jwts.builder().setSubject(uername).setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(java.util.Base64.getDecoder().decode(secretKey));
+    }
+
+    public String generateToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
+                .signWith(getSigningKey())
                 .compact();
     }
 
     public String extractUsername(String token) {
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
             return true;
-        } catch (JwtException e) {
+        } catch (Exception e) {
             return false;
         }
     }
